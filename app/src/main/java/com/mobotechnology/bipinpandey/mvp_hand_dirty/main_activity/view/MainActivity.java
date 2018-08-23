@@ -2,15 +2,15 @@ package com.mobotechnology.bipinpandey.mvp_hand_dirty.main_activity.view;
 
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mobotechnology.bipinpandey.mvp_hand_dirty.R;
 import com.mobotechnology.bipinpandey.mvp_hand_dirty.main_activity.presenter.MainActivityPresenter;
@@ -20,6 +20,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
     private MainActivityPresenter presenter;
     private TextView myTextView;
     private ProgressBar progressBar;
+
+    private EditText email, userName;
+
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,43 +35,15 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
         presenter = new MainActivityPresenter(this);
 
         myTextView = findViewById(R.id.myTextView);
-        EditText userName = findViewById(R.id.username);
-        EditText email = findViewById(R.id.email);
+
+        email = findViewById(R.id.email);
+        userName = findViewById(R.id.username);
+
+        fab = findViewById(R.id.fab);
+
         initProgressBar();
 
-
-        userName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                presenter.updateFullName(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                hideProgressBar();
-            }
-        });
-
-        email.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                presenter.updateEmail(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                hideProgressBar();
-            }
-        });
-
+        fab.setOnClickListener(onClickListener);
     }
 
     private void initProgressBar() {
@@ -77,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
                 250);
         params.addRule(RelativeLayout.CENTER_IN_PARENT);
         this.addContentView(progressBar, params);
-        showProgressBar();
     }
 
     @Override
@@ -94,4 +69,23 @@ public class MainActivity extends AppCompatActivity implements MainActivityPrese
     public void hideProgressBar() {
         progressBar.setVisibility(View.INVISIBLE);
     }
+
+    @Override
+    public void onLoginResponse(boolean isSuccess) {
+        Toast.makeText(this, "onLoginResponse : " + isSuccess, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onLoginFailed() {
+        Toast.makeText(this, "onLoginFailed", Toast.LENGTH_SHORT).show();
+    }
+
+    private View.OnClickListener onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            presenter.updateEmail(email.getText().toString());
+            presenter.updateFullName(userName.getText().toString());
+            presenter.Login();
+        }
+    };
 }
